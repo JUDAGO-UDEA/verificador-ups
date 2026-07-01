@@ -500,7 +500,7 @@ async function cargarAdmin(){
   const list=document.getElementById('queue-list');
   list.innerHTML='<div class="empty"><span class="spinner"></span></div>';
   try{
-    const data=await sbGet('reportes','order=created_at.asc');
+    const data=await sbGet('reportes','order=done.asc,created_at.asc');
     const total=data.length,done=data.filter(r=>r.done).length;
     document.getElementById('st-total').textContent=total;
     document.getElementById('st-pend').textContent=total-done;
