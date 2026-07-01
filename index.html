@@ -29,8 +29,7 @@
   .nav-item:hover { background: var(--bg); color: var(--text-primary); }
   .nav-item.active { background: var(--accent-light); color: var(--accent-text); border-left-color: var(--accent); font-weight: 500; }
   .badge { background: var(--danger); color: #fff; border-radius: 20px; font-size: 11px; font-weight: 600; min-width: 18px; height: 18px; padding: 0 5px; display: none; align-items: center; justify-content: center; margin-left: auto; }
-  .view { display: none; }
-  .view.active { display: block; }
+  .view { display: none; } .view.active { display: block; }
   .page-header { margin-bottom: 1.5rem; }
   .page-title { font-size: 22px; font-weight: 600; }
   .page-sub { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
@@ -47,9 +46,7 @@
   .tipo-opt.purple input:checked + .tipo-label { border-color: var(--purple); background: var(--purple-light); color: var(--purple-text); }
   .tipo-opt.warning input:checked + .tipo-label { border-color: var(--warning); background: var(--warning-light); color: var(--warning-text); }
   .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .dot-v12 { background: var(--accent); }
-  .dot-tf { background: var(--warning); }
-  .dot-todo { background: var(--purple); }
+  .dot-v12 { background: var(--accent); } .dot-tf { background: var(--warning); } .dot-todo { background: var(--purple); }
   .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; }
   .pill-v12 { background: var(--accent-light); color: var(--accent-text); }
   .pill-tf { background: var(--warning-light); color: var(--warning-text); }
@@ -57,22 +54,27 @@
   .pill-pending { background: var(--warning-light); color: var(--warning-text); }
   .pill-done { background: var(--success-light); color: var(--success-text); }
   .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-primary); font-family: inherit; transition: all 0.12s; }
-  .btn:hover { background: var(--bg); }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn:hover { background: var(--bg); } .btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .btn-primary { background: var(--accent); color: #fff; border-color: transparent; }
   .btn-primary:hover { background: var(--accent-hover); }
   .btn-full { width: 100%; justify-content: center; }
   .btn-check { background: var(--success-light); color: var(--success-text); border-color: var(--success-border); font-size: 13px; height: 32px; padding: 0 12px; }
   .btn-check:hover { background: #D1FAE5; }
   .btn-checked { background: var(--success-light); color: var(--success-text); border-color: var(--success-border); font-size: 13px; height: 32px; padding: 0 12px; cursor: default; }
+  .btn-danger { background: var(--danger-light); color: var(--danger-text); border-color: var(--danger-border); font-size: 13px; height: 32px; padding: 0 12px; }
+  .btn-danger:hover { background: #FEE2E2; }
   .btn-sm { height: 30px; font-size: 13px; padding: 0 12px; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
   .stat-num { font-size: 26px; font-weight: 600; line-height: 1; }
   .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  /* Cola */
   .queue-item { border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 0.6rem; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; transition: opacity 0.2s; }
   .queue-item.is-done { opacity: 0.5; }
+  .queue-item.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
   .queue-main { display: flex; align-items: flex-start; gap: 12px; padding: 1rem 1.25rem; }
+  .queue-check { display: flex; align-items: center; padding-top: 2px; }
+  .queue-check input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
   .queue-num { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 22px; padding-top: 3px; }
   .queue-body { flex: 1; min-width: 0; }
   .queue-id { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
@@ -81,22 +83,30 @@
   .queue-obs { font-size: 13px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
   .queue-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .queue-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-  /* Panel de respuesta admin */
+  /* Panel respuesta */
   .reply-panel { border-top: 1px solid var(--border); background: var(--surface2); padding: 0.75rem 1.25rem; display: none; }
   .reply-panel.open { display: block; }
   .reply-panel textarea { margin-bottom: 8px; min-height: 60px; font-size: 13px; }
   .reply-row { display: flex; gap: 8px; justify-content: flex-end; }
-  /* Notificación compañero */
+  /* Notificaciones compañero */
   .notif-card { background: var(--accent-light); border: 1.5px solid var(--accent); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
   .notif-card.has-reply { background: var(--warning-light); border-color: var(--warning); }
-  .notif-title { font-size: 13px; font-weight: 600; color: var(--accent-text); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .notif-title { font-size: 13px; font-weight: 600; color: var(--accent-text); margin-bottom: 4px; }
   .notif-card.has-reply .notif-title { color: var(--warning-text); }
   .notif-up { font-size: 14px; font-weight: 600; color: var(--text-primary); }
   .notif-reply-box { background: var(--surface); border: 1px solid var(--warning-border); border-radius: var(--radius); padding: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--text-primary); font-style: italic; }
-  .notif-reply-box::before { content: '💬 '; }
+  /* Barra selección múltiple */
+  .bulk-bar { display: none; background: var(--accent); color: #fff; border-radius: var(--radius-lg); padding: 10px 16px; margin-bottom: 1rem; align-items: center; gap: 12px; }
+  .bulk-bar.visible { display: flex; }
+  .bulk-bar span { flex: 1; font-size: 14px; font-weight: 500; }
+  .btn-bulk-del { background: var(--danger); color: #fff; border: none; border-radius: var(--radius); padding: 0 14px; height: 32px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .btn-bulk-del:hover { opacity: 0.85; }
+  .btn-bulk-cancel { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: var(--radius); padding: 0 14px; height: 32px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  /* Alerts */
   .alert { padding: 10px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 1rem; display: none; align-items: center; gap: 8px; }
   .alert-ok { background: var(--success-light); color: var(--success-text); border: 1px solid var(--success-border); }
   .alert-err { background: var(--danger-light); color: var(--danger-text); border: 1px solid var(--danger-border); }
+  .alert-warn { background: var(--warning-light); color: var(--warning-text); border: 1px solid var(--warning-border); }
   .names-ta { font-family: monospace; font-size: 13px; min-height: 140px; }
   .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -105,9 +115,7 @@
   .reporte-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 10px; }
   @media (max-width: 640px) {
     .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); padding: 0.5rem; overflow-x: auto; }
-    .main { margin-left: 0; padding: 1rem; }
-    .shell { flex-direction: column; }
-    .logo { display: none; }
+    .main { margin-left: 0; padding: 1rem; } .shell { flex-direction: column; } .logo { display: none; }
     .nav-item { padding: 8px 10px; font-size: 13px; border-left: none; border-bottom: 3px solid transparent; }
     .nav-item.active { border-left: none; border-bottom-color: var(--accent); }
   }
@@ -121,11 +129,15 @@ const SB_KEY = 'sb_publishable_TcyUigagoZqIXd2psCFkhQ_EASPkgt_';
 const H = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
 const MODO_REPORTE = new URLSearchParams(window.location.search).get('modo') === 'reporte';
 
+// ── Supabase helpers ─────────────────────────────────────────────────────────
 async function sbGet(t,q=''){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{headers:H});if(!r.ok)throw new Error(await r.text());return r.json();}
 async function sbPost(t,body){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json();}
 async function sbPatch(t,id,body){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json();}
+async function sbDeleteId(t,id){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:'DELETE',headers:H});if(!r.ok)throw new Error(await r.text());}
+async function sbDeleteMany(t,ids){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=in.(${ids.join(',')})`,{method:'DELETE',headers:H});if(!r.ok)throw new Error(await r.text());}
 async function sbDelete(t,q){const r=await fetch(`${SB_URL}/rest/v1/${t}?${q}`,{method:'DELETE',headers:H});if(!r.ok)throw new Error(await r.text());}
 
+// ── Utilidades ───────────────────────────────────────────────────────────────
 function fmt(ts){const d=new Date(ts);return d.toLocaleDateString('es-CO',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});}
 function tipoPill(t){
   if(!t)return '';
@@ -147,9 +159,17 @@ function getTipos(){
   return sel.join(' + ');
 }
 
-// ── FORMULARIO HTML compartido ───────────────────────────────────────────────
+// Normaliza tipo para comparar: "Todo" equivale a tener todos los tipos
+function tiposSet(t){
+  if(!t) return new Set();
+  if(t==='Todo') return new Set(['V1 y V2','Transferencias','Todo']);
+  return new Set(t.split('+').map(x=>x.trim()));
+}
+
+// ── Formulario HTML reutilizable ─────────────────────────────────────────────
 function formHTML(){
   return `
+    <div id="alert-dup" class="alert alert-warn">⚠️ <span id="dup-msg">Esta UP ya fue reportada con ese tipo de verificación.</span></div>
     <div id="alert-ok" class="alert alert-ok">✓ Reporte enviado. Juan David lo verá en su cola.</div>
     <div id="alert-err" class="alert alert-err">✗ <span id="err-msg"></span></div>
     <div class="card">
@@ -202,10 +222,7 @@ function renderModoReporte(){
       </div>
     </div>`;
   initCheckboxes();
-  document.getElementById('sel-nombre').addEventListener('change', ()=>{
-    cargarMisReportes();
-    cargarNotificaciones();
-  });
+  document.getElementById('sel-nombre').addEventListener('change',()=>{cargarMisReportes();cargarNotificaciones();});
   cargarNombres();
 }
 
@@ -243,14 +260,23 @@ function renderModoAdmin(){
           <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
             <div>
               <div class="page-title">Cola de verificación</div>
-              <div class="page-sub">En orden de llegada · marca cada UP cuando la completes</div>
+              <div class="page-sub">En orden de llegada · marca o elimina UPs</div>
             </div>
-            <button class="btn" onclick="cargarAdmin()">↻ Actualizar</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-sm" onclick="toggleSeleccion()" id="btn-sel-mode">☑ Seleccionar</button>
+              <button class="btn btn-sm" onclick="cargarAdmin()">↻ Actualizar</button>
+            </div>
           </div>
           <div class="stats">
             <div class="stat"><div class="stat-num" id="st-total">—</div><div class="stat-label">Reportadas</div></div>
             <div class="stat"><div class="stat-num" id="st-pend">—</div><div class="stat-label">Pendientes</div></div>
             <div class="stat"><div class="stat-num" id="st-done">—</div><div class="stat-label">Verificadas</div></div>
+          </div>
+          <!-- Barra selección múltiple -->
+          <div class="bulk-bar" id="bulk-bar">
+            <span id="bulk-count">0 seleccionados</span>
+            <button class="btn-bulk-del" onclick="eliminarSeleccionados()">🗑 Eliminar seleccionados</button>
+            <button class="btn-bulk-cancel" onclick="cancelarSeleccion()">✕ Cancelar</button>
           </div>
           <div id="queue-list"><div class="empty"><span class="spinner"></span></div></div>
         </div>
@@ -270,9 +296,7 @@ function renderModoAdmin(){
           </div>
           <div class="card">
             <div class="sec-label">Enlace para compañeros</div>
-            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">
-              Comparte este enlace. Tus compañeros solo verán el formulario y sus notificaciones — sin acceso a la cola ni configuración.
-            </p>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Comparte este enlace. Tus compañeros solo verán el formulario y sus notificaciones — sin acceso a la cola ni configuración.</p>
             <div id="share-url" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);font-family:monospace;word-break:break-all;margin-bottom:10px;">Calculando…</div>
             <button class="btn" onclick="copiarEnlace()">📋 Copiar enlace de reporte</button>
           </div>
@@ -280,30 +304,83 @@ function renderModoAdmin(){
 
       </main>
     </div>`;
-
   initCheckboxes();
-  document.getElementById('sel-nombre').addEventListener('change', cargarMisReportes);
+  document.getElementById('sel-nombre').addEventListener('change',cargarMisReportes);
   cargarNombres();
   actualizarBadge();
   generarEnlaceCompartir();
 }
 
+// ── Selección múltiple ───────────────────────────────────────────────────────
+let modoSeleccion = false;
+let seleccionados = new Set();
+
+function toggleSeleccion(){
+  modoSeleccion = !modoSeleccion;
+  seleccionados.clear();
+  const btn = document.getElementById('btn-sel-mode');
+  if(btn) btn.textContent = modoSeleccion ? '✕ Cancelar selección' : '☑ Seleccionar';
+  document.getElementById('bulk-bar')?.classList.toggle('visible', false);
+  cargarAdmin();
+}
+
+function cancelarSeleccion(){
+  modoSeleccion = false;
+  seleccionados.clear();
+  const btn = document.getElementById('btn-sel-mode');
+  if(btn) btn.textContent = '☑ Seleccionar';
+  document.getElementById('bulk-bar')?.classList.remove('visible');
+  cargarAdmin();
+}
+
+function toggleCheck(id){
+  if(seleccionados.has(id)) seleccionados.delete(id);
+  else seleccionados.add(id);
+  document.querySelector(`#qi-${id}`)?.classList.toggle('selected', seleccionados.has(id));
+  const bar = document.getElementById('bulk-bar');
+  const count = document.getElementById('bulk-count');
+  if(bar && count){
+    bar.classList.toggle('visible', seleccionados.size > 0);
+    count.textContent = `${seleccionados.size} seleccionado${seleccionados.size!==1?'s':''}`;
+  }
+}
+
+async function eliminarSeleccionados(){
+  if(!seleccionados.size) return;
+  if(!confirm(`¿Eliminar ${seleccionados.size} reporte(s)? Esta acción no se puede deshacer.`)) return;
+  try{
+    await sbDeleteMany('reportes', [...seleccionados]);
+    seleccionados.clear();
+    modoSeleccion = false;
+    const btn = document.getElementById('btn-sel-mode');
+    if(btn) btn.textContent = '☑ Seleccionar';
+    document.getElementById('bulk-bar')?.classList.remove('visible');
+    cargarAdmin();
+  }catch(e){ alert('Error al eliminar: '+e.message); }
+}
+
+async function eliminarUno(id){
+  if(!confirm('¿Eliminar este reporte? Esta acción no se puede deshacer.')) return;
+  try{
+    await sbDeleteId('reportes', id);
+    cargarAdmin();
+  }catch(e){ alert('Error al eliminar: '+e.message); }
+}
+
+// ── Navegación admin ─────────────────────────────────────────────────────────
 function generarEnlaceCompartir(){
   const base=window.location.href.split('?')[0];
   const el=document.getElementById('share-url');
   if(el) el.textContent=base+'?modo=reporte';
 }
-
 function copiarEnlace(){
   const url=document.getElementById('share-url').textContent;
   navigator.clipboard.writeText(url).then(()=>{
     const btn=event.target.closest('button');
-    const orig=btn.innerHTML;
-    btn.innerHTML='✓ Copiado';
+    const orig=btn.innerHTML; btn.innerHTML='✓ Copiado';
     setTimeout(()=>{btn.innerHTML=orig;},2000);
   });
 }
-
 function switchView(v){
   ['form','admin','config'].forEach(x=>{
     document.getElementById('view-'+x).classList.toggle('active',x===v);
@@ -314,7 +391,7 @@ function switchView(v){
   if(v==='form') cargarMisReportes();
 }
 
-// ── FUNCIONES COMPARTIDAS ────────────────────────────────────────────────────
+// ── Funciones compartidas ────────────────────────────────────────────────────
 async function cargarNombres(){
   try{
     const data=await sbGet('nombres','order=nombre.asc');
@@ -328,44 +405,59 @@ async function cargarNombres(){
 
 async function enviarReporte(){
   const nombre=document.getElementById('sel-nombre').value;
-  const upId=document.getElementById('inp-up').value.trim();
+  const upId=document.getElementById('inp-up').value.trim().toUpperCase();
   const tipo=getTipos();
   const obs=document.getElementById('inp-obs').value.trim();
-  showAlert('alert-ok',false);showAlert('alert-err',false);
+  showAlert('alert-ok',false); showAlert('alert-err',false); showAlert('alert-dup',false);
   if(!nombre){alert('Selecciona tu nombre.');return;}
   if(!upId){alert('Ingresa el ID de la Unidad Productiva.');return;}
   if(!tipo){alert('Selecciona al menos un tipo de verificación.');return;}
+
+  // Validar duplicado por UP + tipo
+  try{
+    const existentes=await sbGet('reportes',`up_id=eq.${encodeURIComponent(upId)}&select=tipo`);
+    const tipoNuevo=tiposSet(tipo);
+    for(const ex of existentes){
+      const tipoEx=tiposSet(ex.tipo);
+      // Verificar intersección
+      const hayDup=[...tipoNuevo].some(t=>tipoEx.has(t)||tipoEx.has('Todo'))||([...tipoEx].some(t=>tipoNuevo.has(t)||tipoNuevo.has('Todo')));
+      if(hayDup){
+        const dupMsg=document.getElementById('dup-msg');
+        if(dupMsg) dupMsg.textContent=`La UP "${upId}" ya tiene un reporte para "${ex.tipo}". No se puede duplicar el mismo tipo.`;
+        showAlert('alert-dup',true);
+        return;
+      }
+    }
+  }catch(e){/* Si falla la validación, dejamos pasar */}
+
   const btn=document.getElementById('btn-enviar');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Enviando…';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enviando…';
   try{
     await sbPost('reportes',{up_id:upId,nombre,tipo,obs:obs||null,done:false,respuesta:null,respuesta_leida:false});
     document.getElementById('inp-up').value='';
     document.getElementById('inp-obs').value='';
-    chkV12().checked=false;chkTf().checked=false;chkTodo().checked=false;
+    chkV12().checked=false; chkTf().checked=false; chkTodo().checked=false;
     showAlert('alert-ok',true);
     setTimeout(()=>showAlert('alert-ok',false),4500);
     cargarMisReportes();
-    if(!MODO_REPORTE)actualizarBadge();
+    if(!MODO_REPORTE) actualizarBadge();
   }catch(e){
     document.getElementById('err-msg').textContent=e.message;
     showAlert('alert-err',true);
   }
-  btn.disabled=false;btn.innerHTML='↑ Enviar reporte';
+  btn.disabled=false; btn.innerHTML='↑ Enviar reporte';
 }
 
 async function cargarNotificaciones(){
   const nombre=document.getElementById('sel-nombre').value;
   const area=document.getElementById('notif-area');
-  if(!area||!nombre){return;}
+  if(!area||!nombre) return;
   try{
-    // UPs verificadas con respuesta no leída
     const data=await sbGet('reportes',`nombre=eq.${encodeURIComponent(nombre)}&done=eq.true&respuesta_leida=eq.false&select=id,up_id,tipo,respuesta,done_ts`);
     if(!data.length){area.innerHTML='';return;}
     area.innerHTML=data.map(r=>`
       <div class="notif-card ${r.respuesta?'has-reply':''}" id="notif-${r.id}">
-        <div class="notif-title">
-          ${r.respuesta?'💬 Juan David dejó una observación':'✅ UP verificada'}
-        </div>
+        <div class="notif-title">${r.respuesta?'💬 Juan David dejó una observación':'✅ UP verificada'}</div>
         <div class="notif-up">${r.up_id} · ${tipoPill(r.tipo)}</div>
         ${r.respuesta?`<div class="notif-reply-box">${r.respuesta}</div>`:''}
         <div style="margin-top:10px;display:flex;justify-content:flex-end;">
@@ -376,10 +468,8 @@ async function cargarNotificaciones(){
 }
 
 async function marcarNotifLeida(id){
-  try{
-    await sbPatch('reportes',id,{respuesta_leida:true});
-    document.getElementById('notif-'+id)?.remove();
-  }catch(e){alert('Error: '+e.message);}
+  try{await sbPatch('reportes',id,{respuesta_leida:true});document.getElementById('notif-'+id)?.remove();}
+  catch(e){alert('Error: '+e.message);}
 }
 
 async function cargarMisReportes(){
@@ -418,8 +508,9 @@ async function cargarAdmin(){
     actualizarBadge(total-done);
     if(!total){list.innerHTML='<div class="empty">📥<br>Sin reportes aún.</div>';return;}
     list.innerHTML=data.map((r,i)=>`
-      <div class="queue-item ${r.done?'is-done':''}" id="qi-${r.id}">
+      <div class="queue-item ${r.done?'is-done':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}">
         <div class="queue-main">
+          ${modoSeleccion?`<div class="queue-check"><input type="checkbox" ${seleccionados.has(r.id)?'checked':''} onchange="toggleCheck(${r.id})" /></div>`:''}
           <div class="queue-num">#${i+1}</div>
           <div class="queue-body">
             <div class="queue-id">${r.up_id}</div>
@@ -429,15 +520,19 @@ async function cargarAdmin(){
             <div class="queue-time">⏱ ${fmt(r.created_at)}</div>
           </div>
           <div class="queue-actions">
-            ${r.done
-              ?`<button class="btn btn-checked btn-sm" disabled>✓ Listo</button>
-                <button class="btn btn-sm" onclick="toggleReply(${r.id})">💬 ${r.respuesta?'Editar resp.':'Responder'}</button>`
-              :`<button class="btn btn-check btn-sm" onclick="abrirVerificar(${r.id})">✓ Marcar listo</button>`
-            }
+            ${!modoSeleccion ? `
+              ${r.done
+                ?`<button class="btn btn-checked btn-sm" disabled>✓ Listo</button>
+                  <button class="btn btn-sm" onclick="toggleReply(${r.id})">💬 ${r.respuesta?'Editar resp.':'Responder'}</button>`
+                :`<button class="btn btn-check btn-sm" onclick="abrirVerificar(${r.id})">✓ Marcar listo</button>`
+              }
+              <button class="btn btn-danger btn-sm" onclick="eliminarUno(${r.id})">🗑</button>
+            ` : ''}
           </div>
         </div>
+        ${!modoSeleccion ? `
         <div class="reply-panel" id="reply-${r.id}">
-          <label style="font-size:12px;margin-bottom:4px;">Observación de devolución para ${r.nombre}:</label>
+          <label style="font-size:12px;margin-bottom:4px;">Observación para ${r.nombre}:</label>
           <textarea id="ta-reply-${r.id}" placeholder="Escribe tu observación aquí…">${r.respuesta||''}</textarea>
           <div class="reply-row">
             <button class="btn btn-sm" onclick="toggleReply(${r.id})">Cancelar</button>
@@ -453,6 +548,7 @@ async function cargarAdmin(){
             <button class="btn btn-check btn-sm" onclick="marcarHecho(${r.id})">✓ Confirmar verificación</button>
           </div>
         </div>`:''}
+        ` : ''}
       </div>`).join('');
   }catch(e){list.innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
 }
@@ -463,23 +559,19 @@ function abrirVerificar(id){
   document.getElementById('verificar-'+id)?.classList.add('open');
 }
 function cerrarVerificar(id){document.getElementById('verificar-'+id)?.classList.remove('open');}
-
-function toggleReply(id){
-  const panel=document.getElementById('reply-'+id);
-  if(panel) panel.classList.toggle('open');
-}
+function toggleReply(id){document.getElementById('reply-'+id)?.classList.toggle('open');}
 
 async function marcarHecho(id){
   const ta=document.getElementById('ta-verificar-'+id);
   const respuesta=ta?ta.value.trim():null;
   const btn=event.target;
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
   try{
-    await sbPatch('reportes',id,{done:true,done_ts:new Date().toISOString(),respuesta:respuesta||null,respuesta_leida:false});
+    await sbPatch('reportes',id,{done:true,done_ts:new Date().toISOString(),respuesta:respuesta||null,respuesta_leida:!respuesta});
     cargarAdmin();
   }catch(e){
     alert('Error: '+e.message);
-    btn.disabled=false;btn.innerHTML='✓ Confirmar verificación';
+    btn.disabled=false; btn.innerHTML='✓ Confirmar verificación';
   }
 }
 
@@ -488,14 +580,13 @@ async function enviarRespuesta(id){
   const respuesta=ta?ta.value.trim():'';
   if(!respuesta){alert('Escribe una observación antes de enviar.');return;}
   const btn=event.target;
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
   try{
     await sbPatch('reportes',id,{respuesta,respuesta_leida:false});
-    toggleReply(id);
-    cargarAdmin();
+    toggleReply(id); cargarAdmin();
   }catch(e){
     alert('Error: '+e.message);
-    btn.disabled=false;btn.innerHTML='💬 Enviar respuesta';
+    btn.disabled=false; btn.innerHTML='💬 Enviar respuesta';
   }
 }
 
@@ -514,16 +605,16 @@ async function cargarConfig(){
 async function guardarNombres(){
   const raw=document.getElementById('names-ta').value;
   const names=raw.split('\n').map(n=>n.trim()).filter(Boolean);
-  showAlert('cfg-ok',false);showAlert('cfg-err',false);
+  showAlert('cfg-ok',false); showAlert('cfg-err',false);
   const btn=document.getElementById('btn-guardar');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Guardando…';
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Guardando…';
   try{
     await sbDelete('nombres','id=gte.0');
-    if(names.length)await sbPost('nombres',names.map(n=>({nombre:n})));
-    showAlert('cfg-ok',true);setTimeout(()=>showAlert('cfg-ok',false),3000);
+    if(names.length) await sbPost('nombres',names.map(n=>({nombre:n})));
+    showAlert('cfg-ok',true); setTimeout(()=>showAlert('cfg-ok',false),3000);
     cargarNombres();
   }catch(e){document.getElementById('cfg-err-msg').textContent=e.message;showAlert('cfg-err',true);}
-  btn.disabled=false;btn.innerHTML='💾 Guardar lista';
+  btn.disabled=false; btn.innerHTML='💾 Guardar lista';
 }
 
 // Iniciar
