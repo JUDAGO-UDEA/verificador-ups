@@ -53,6 +53,8 @@
   .pill-todo { background: var(--purple-light); color: var(--purple-text); }
   .pill-pending { background: var(--warning-light); color: var(--warning-text); }
   .pill-done { background: var(--success-light); color: var(--success-text); }
+  .pill-espera { background: var(--danger-light); color: var(--danger-text); }
+  .queue-item.is-espera { border-left: 3px solid var(--danger); background: #fff8f8; }
   .btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; height: 36px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-primary); font-family: inherit; transition: all 0.12s; }
   .btn:hover { background: var(--bg); } .btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .btn-primary { background: var(--accent); color: #fff; border-color: transparent; }
@@ -433,7 +435,7 @@ async function enviarReporte(){
   const btn=document.getElementById('btn-enviar');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enviando…';
   try{
-    await sbPost('reportes',{up_id:upId,nombre,tipo,obs:obs||null,done:false,respuesta:null,respuesta_leida:false});
+    await sbPost('reportes',{up_id:upId,nombre,tipo,obs:obs||null,done:false,estado:'pendiente',respuesta:null,respuesta_leida:false});
     document.getElementById('inp-up').value='';
     document.getElementById('inp-obs').value='';
     chkV12().checked=false; chkTf().checked=false; chkTodo().checked=false;
@@ -486,7 +488,7 @@ async function cargarMisReportes(){
         <div class="queue-main">
           <div class="queue-body">
             <div class="queue-id">${r.up_id}</div>
-            <div class="queue-meta">${tipoPill(r.tipo)} ${r.done?'<span class="pill pill-done">✓ Verificado</span>':'<span class="pill pill-pending">Pendiente</span>'}</div>
+            <div class="queue-meta">${tipoPill(r.tipo)} ${r.done?'<span class="pill pill-done">✓ Verificado</span>':r.estado==='espera'?'<span class="pill pill-espera">⏸ En espera</span>':'<span class="pill pill-pending">Pendiente</span>'}</div>
             ${r.obs?`<div class="queue-obs">"${r.obs}"</div>`:''}
             ${r.respuesta?`<div style="margin-top:6px;font-size:13px;color:var(--warning-text);background:var(--warning-light);border-radius:6px;padding:6px 10px;">💬 <b>Respuesta:</b> ${r.respuesta}</div>`:''}
             <div class="queue-time">${fmt(r.created_at)}${r.done&&r.done_ts?' · verificado '+fmt(r.done_ts):''}</div>
@@ -500,21 +502,21 @@ async function cargarAdmin(){
   const list=document.getElementById('queue-list');
   list.innerHTML='<div class="empty"><span class="spinner"></span></div>';
   try{
-    const data=await sbGet('reportes','order=done.asc,created_at.asc');
-    const total=data.length,done=data.filter(r=>r.done).length;
+    const data=await sbGet('reportes','order=done.asc,estado.asc,created_at.asc');
+    const total=data.length,done=data.filter(r=>r.done).length,espera=data.filter(r=>!r.done&&r.estado==='espera').length;
     document.getElementById('st-total').textContent=total;
     document.getElementById('st-pend').textContent=total-done;
     document.getElementById('st-done').textContent=done;
     actualizarBadge(total-done);
     if(!total){list.innerHTML='<div class="empty">📥<br>Sin reportes aún.</div>';return;}
     list.innerHTML=data.map((r,i)=>`
-      <div class="queue-item ${r.done?'is-done':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}">
+      <div class="queue-item ${r.done?'is-done':r.estado==='espera'?'is-espera':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}">
         <div class="queue-main">
           ${modoSeleccion?`<div class="queue-check"><input type="checkbox" ${seleccionados.has(r.id)?'checked':''} onchange="toggleCheck(${r.id})" /></div>`:''}
           <div class="queue-num">#${i+1}</div>
           <div class="queue-body">
             <div class="queue-id">${r.up_id}</div>
-            <div class="queue-meta">${tipoPill(r.tipo)}<span class="queue-reporter">👤 ${r.nombre}</span></div>
+            <div class="queue-meta">${tipoPill(r.tipo)}<span class="queue-reporter">👤 ${r.nombre}</span>${r.estado==='espera'?'<span class="pill pill-espera">⏸ En espera</span>':''}</div>
             ${r.obs?`<div class="queue-obs">"${r.obs}"</div>`:''}
             ${r.respuesta?`<div style="margin-top:5px;font-size:12px;color:var(--warning-text);">💬 Respuesta enviada: "${r.respuesta}"</div>`:''}
             <div class="queue-time">⏱ ${fmt(r.created_at)}</div>
@@ -524,7 +526,11 @@ async function cargarAdmin(){
               ${r.done
                 ?`<button class="btn btn-checked btn-sm" disabled>✓ Listo</button>
                   <button class="btn btn-sm" onclick="toggleReply(${r.id})">💬 ${r.respuesta?'Editar resp.':'Responder'}</button>`
-                :`<button class="btn btn-check btn-sm" onclick="abrirVerificar(${r.id})">✓ Marcar listo</button>`
+                :r.estado==='espera'
+                  ?`<button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger-text);border-color:var(--danger-border);" onclick="marcarPendiente(${r.id})">↩ Quitar espera</button>
+                    <button class="btn btn-check btn-sm" onclick="abrirVerificar(${r.id})">✓ Marcar listo</button>`
+                  :`<button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger-text);border-color:var(--danger-border);" onclick="marcarEspera(${r.id})">⏸ En espera</button>
+                    <button class="btn btn-check btn-sm" onclick="abrirVerificar(${r.id})">✓ Marcar listo</button>`
               }
               <button class="btn btn-danger btn-sm" onclick="eliminarUno(${r.id})">🗑</button>
             ` : ''}
@@ -551,6 +557,20 @@ async function cargarAdmin(){
         ` : ''}
       </div>`).join('');
   }catch(e){list.innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
+}
+
+async function marcarEspera(id){
+  try{
+    await sbPatch('reportes',id,{estado:'espera'});
+    cargarAdmin();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+async function marcarPendiente(id){
+  try{
+    await sbPatch('reportes',id,{estado:'pendiente'});
+    cargarAdmin();
+  }catch(e){alert('Error: '+e.message);}
 }
 
 function abrirVerificar(id){
