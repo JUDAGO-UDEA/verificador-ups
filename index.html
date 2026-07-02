@@ -112,7 +112,14 @@
   .names-ta { font-family: monospace; font-size: 13px; min-height: 140px; }
   .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .sec-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+  /* Filtros */
+  .filter-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.875rem 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+  .filter-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0; }
+  .filter-group select, .filter-group input[type=date] { margin: 0; height: 34px; font-size: 13px; padding: 0 8px; }
+  .filter-count { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .btn-clear-filters { height: 34px; font-size: 12px; padding: 0 10px; color: var(--text-muted); border-color: var(--border); }
   .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 14px; }
   .reporte-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 10px; }
   @media (max-width: 640px) {
@@ -280,6 +287,43 @@ function renderModoAdmin(){
             <button class="btn-bulk-del" onclick="eliminarSeleccionados()">🗑 Eliminar seleccionados</button>
             <button class="btn-bulk-cancel" onclick="cancelarSeleccion()">✕ Cancelar</button>
           </div>
+          <!-- Filtros -->
+          <div class="filter-bar">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label>Reportante</label>
+                <select id="f-nombre" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+              </div>
+              <div class="filter-group">
+                <label>Tipo</label>
+                <select id="f-tipo" onchange="aplicarFiltros()">
+                  <option value="">Todos</option>
+                  <option value="V1 y V2">V1 + V2</option>
+                  <option value="Transferencias">Transferencias</option>
+                  <option value="Todo">Todo</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Estado</label>
+                <select id="f-estado" onchange="aplicarFiltros()">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="espera">En espera</option>
+                  <option value="done">Verificado</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Desde</label>
+                <input type="date" id="f-desde" onchange="aplicarFiltros()" />
+              </div>
+              <div class="filter-group">
+                <label>Hasta</label>
+                <input type="date" id="f-hasta" onchange="aplicarFiltros()" />
+              </div>
+              <button class="btn btn-clear-filters" onclick="limpiarFiltros()">✕ Limpiar</button>
+            </div>
+            <div class="filter-count" id="filter-count"></div>
+          </div>
           <div id="queue-list"><div class="empty"><span class="spinner"></span></div></div>
         </div>
 
@@ -316,6 +360,7 @@ function renderModoAdmin(){
 // ── Selección múltiple ───────────────────────────────────────────────────────
 let modoSeleccion = false;
 let seleccionados = new Set();
+let todosLosReportes = []; // cache para filtros
 
 function toggleSeleccion(){
   modoSeleccion = !modoSeleccion;
@@ -503,12 +548,56 @@ async function cargarAdmin(){
   list.innerHTML='<div class="empty"><span class="spinner"></span></div>';
   try{
     const data=await sbGet('reportes','order=done.asc,estado.asc,created_at.asc');
-    const total=data.length,done=data.filter(r=>r.done).length,espera=data.filter(r=>!r.done&&r.estado==='espera').length;
-    document.getElementById('st-total').textContent=total;
-    document.getElementById('st-pend').textContent=total-done;
-    document.getElementById('st-done').textContent=done;
-    actualizarBadge(total-done);
-    if(!total){list.innerHTML='<div class="empty">📥<br>Sin reportes aún.</div>';return;}
+    todosLosReportes=data;
+    // Poblar filtro de nombres
+    const fNombre=document.getElementById('f-nombre');
+    if(fNombre){
+      const cur=fNombre.value;
+      const nombres=[...new Set(data.map(r=>r.nombre))].sort();
+      fNombre.innerHTML='<option value="">Todos</option>'+nombres.map(n=>`<option value="${n}" ${n===cur?'selected':''}>${n}</option>`).join('');
+    }
+    renderQueue(data);
+  }catch(e){document.getElementById('queue-list').innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
+}
+
+function aplicarFiltros(){
+  const fNombre=document.getElementById('f-nombre')?.value||'';
+  const fTipo=document.getElementById('f-tipo')?.value||'';
+  const fEstado=document.getElementById('f-estado')?.value||'';
+  const fDesde=document.getElementById('f-desde')?.value||'';
+  const fHasta=document.getElementById('f-hasta')?.value||'';
+  let datos=todosLosReportes;
+  if(fNombre) datos=datos.filter(r=>r.nombre===fNombre);
+  if(fTipo) datos=datos.filter(r=>r.tipo&&r.tipo.includes(fTipo));
+  if(fEstado==='done') datos=datos.filter(r=>r.done);
+  else if(fEstado==='espera') datos=datos.filter(r=>!r.done&&r.estado==='espera');
+  else if(fEstado==='pendiente') datos=datos.filter(r=>!r.done&&r.estado!=='espera');
+  if(fDesde) datos=datos.filter(r=>new Date(r.created_at)>=new Date(fDesde));
+  if(fHasta) datos=datos.filter(r=>new Date(r.created_at)<=new Date(fHasta+'T23:59:59'));
+  renderQueue(datos);
+  const hayFiltros=fNombre||fTipo||fEstado||fDesde||fHasta;
+  const fc=document.getElementById('filter-count');
+  if(fc) fc.textContent=hayFiltros?`Mostrando ${datos.length} de ${todosLosReportes.length} reportes`:'';
+}
+
+function limpiarFiltros(){
+  ['f-nombre','f-tipo','f-estado','f-desde','f-hasta'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
+  const fc=document.getElementById('filter-count');
+  if(fc)fc.textContent='';
+  renderQueue(todosLosReportes);
+}
+
+function renderQueue(data){
+  const list=document.getElementById('queue-list');
+  const total=todosLosReportes.length,done=todosLosReportes.filter(r=>r.done).length;
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-pend').textContent=total-done;
+  document.getElementById('st-done').textContent=done;
+  actualizarBadge(total-done);
+    if(!data.length){list.innerHTML='<div class="empty">📥<br>Sin reportes para los filtros aplicados.</div>';return;}
     list.innerHTML=data.map((r,i)=>`
       <div class="queue-item ${r.done?'is-done':r.estado==='espera'?'is-espera':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}">
         <div class="queue-main">
@@ -556,7 +645,6 @@ async function cargarAdmin(){
         </div>`:''}
         ` : ''}
       </div>`).join('');
-  }catch(e){list.innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
 }
 
 async function marcarEspera(id){
