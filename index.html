@@ -377,7 +377,7 @@ function renderModoAdmin(){
         </div>
         <div class="modal-footer">
           <button class="btn" onclick="copiarListaUPs()">📋 Copiar lista</button>
-          <button class="btn btn-primary" onclick="descargarListaUPs()">⬇ Descargar .txt</button>
+          <button class="btn btn-primary" onclick="descargarExcelUPs()">⬇ Descargar Excel</button>
         </div>
       </div>
     </div>`;
@@ -738,15 +738,19 @@ async function actualizarBadge(pend){
 }
 
 // ── Lista de UPs ─────────────────────────────────────────────────────────────
+function getPendientes(){
+  return todosLosReportes.filter(r=>!r.done);
+}
+
 function verListaUPs(){
   const overlay=document.getElementById('modal-ups');
   const body=document.getElementById('modal-body');
   if(!overlay||!body) return;
   overlay.classList.add('open');
 
-  const data=todosLosReportes;
+  const data=getPendientes();
   if(!data.length){
-    body.innerHTML='<div class="empty">Sin reportes aún.</div>';
+    body.innerHTML='<div class="empty">✅ Sin UPs pendientes por cargar.</div>';
     return;
   }
 
@@ -754,25 +758,33 @@ function verListaUPs(){
   const porNombre={};
   data.forEach(r=>{
     if(!porNombre[r.nombre]) porNombre[r.nombre]=[];
-    porNombre[r.nombre].push(r.up_id);
+    porNombre[r.nombre].push({up_id:r.up_id, tipo:r.tipo, estado:r.estado||'pendiente'});
   });
 
   const todosIds=[...new Set(data.map(r=>r.up_id))].sort();
 
-  let html=`<div class="modal-sub">${todosIds.length} UPs únicas reportadas por ${Object.keys(porNombre).length} compañero(s)</div>`;
+  let html=`<div class="modal-sub">
+    <strong>${todosIds.length}</strong> UPs pendientes por cargar · reportadas por <strong>${Object.keys(porNombre).length}</strong> compañero(s)
+  </div>`;
 
-  // Lista global
-  html+=`<div class="modal-sec">Todas las UPs</div><div class="ups-grid">`;
+  // Lista global de IDs
+  html+=`<div class="modal-sec">IDs pendientes</div><div class="ups-grid">`;
   html+=todosIds.map(id=>`<div class="ups-chip">${id}</div>`).join('');
   html+=`</div>`;
 
   // Por reportante
   html+=`<div class="modal-sec" style="margin-top:1.25rem;">Por reportante</div>`;
   Object.keys(porNombre).sort().forEach(nombre=>{
-    const ids=[...new Set(porNombre[nombre])].sort();
-    html+=`<div style="margin-bottom:0.75rem;">
-      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">👤 ${nombre} <span style="font-weight:400;color:var(--text-muted)">(${ids.length})</span></div>
-      <div class="ups-grid">${ids.map(id=>`<div class="ups-chip">${id}</div>`).join('')}</div>
+    const items=porNombre[nombre];
+    const idsUnicos=[...new Set(items.map(x=>x.up_id))];
+    html+=`<div style="margin-bottom:0.85rem;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">
+        👤 ${nombre} <span style="font-weight:400;color:var(--text-muted)">(${items.length} reporte${items.length!==1?'s':''})</span>
+      </div>
+      <div class="ups-grid">${idsUnicos.map(id=>{
+        const esEspera=items.find(x=>x.up_id===id&&x.estado==='espera');
+        return `<div class="ups-chip" style="${esEspera?'background:var(--danger-light);color:var(--danger-text);border-color:var(--danger-border)':''}">${id}${esEspera?' ⏸':''}</div>`;
+      }).join('')}</div>
     </div>`;
   });
 
@@ -784,7 +796,7 @@ function cerrarModal(){
 }
 
 function copiarListaUPs(){
-  const ids=[...new Set(todosLosReportes.map(r=>r.up_id))].sort();
+  const ids=[...new Set(getPendientes().map(r=>r.up_id))].sort();
   navigator.clipboard.writeText(ids.join('\n')).then(()=>{
     const btn=event.target.closest('button');
     const orig=btn.innerHTML; btn.innerHTML='✓ Copiado';
@@ -792,14 +804,32 @@ function copiarListaUPs(){
   });
 }
 
-function descargarListaUPs(){
-  const ids=[...new Set(todosLosReportes.map(r=>r.up_id))].sort();
-  const fecha=new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
-  const contenido=`LISTA DE UNIDADES PRODUCTIVAS REPORTADAS\nFecha: ${fecha}\nTotal: ${ids.length}\n\n`+ids.join('\n');
-  const blob=new Blob([contenido],{type:'text/plain'});
+function descargarExcelUPs(){
+  const data=getPendientes();
+  if(!data.length){alert('No hay UPs pendientes.');return;}
+
+  const fecha=new Date().toLocaleDateString('es-CO');
+
+  // Construir CSV compatible con Excel (con BOM UTF-8)
+  const cols=['ID Unidad Productiva','Reportante','Tipo de verificación','Estado','Fecha reporte','Observaciones'];
+  const filas=data.map(r=>[
+    r.up_id,
+    r.nombre,
+    r.tipo||'',
+    r.estado==='espera'?'En espera':'Pendiente',
+    new Date(r.created_at).toLocaleDateString('es-CO'),
+    r.obs||''
+  ]);
+
+  const csvContent='\uFEFF'+[cols,...filas]
+    .map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','))
+    .join('\r\n');
+
+  const blob=new Blob([csvContent],{type:'text/csv;charset=utf-8;'});
+  const fechaArchivo=new Date().toLocaleDateString('es-CO').replace(/\//g,'-');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download=`ups-reportadas-${fecha}.txt`;
+  a.download=`ups-pendientes-${fechaArchivo}.csv`;
   a.click();
 }
 
