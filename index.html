@@ -112,14 +112,27 @@
   .names-ta { font-family: monospace; font-size: 13px; min-height: 140px; }
   .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  /* Filtros */
+  /* Bandera descargada */
+  .flag-btn { position: absolute; top: 8px; right: 8px; background: none; border: none; cursor: pointer; font-size: 18px; line-height: 1; opacity: 0.3; transition: opacity 0.15s, transform 0.15s; padding: 2px; }
+  .flag-btn:hover { opacity: 0.7; transform: scale(1.2); }
+  .flag-btn.flagged { opacity: 1; }
+  .queue-item.is-flagged { border-right: 3px solid #EF4444; }
+  /* Filtros tipo Excel - dropdown con checkboxes */
   .filter-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.875rem 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
   .filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
-  .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; position: relative; }
   .filter-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0; }
   .filter-group select, .filter-group input[type=date] { margin: 0; height: 34px; font-size: 13px; padding: 0 8px; }
+  .filter-dropdown-btn { height: 34px; font-size: 13px; padding: 0 10px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--text-primary); cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 6px; font-family: inherit; width: 100%; white-space: nowrap; overflow: hidden; }
+  .filter-dropdown-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); }
+  .filter-dropdown-panel { position: absolute; top: calc(100% + 4px); left: 0; min-width: 180px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1)); z-index: 50; padding: 6px; display: none; }
+  .filter-dropdown-panel.open { display: block; }
+  .filter-chk-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-primary); }
+  .filter-chk-item:hover { background: var(--bg); }
+  .filter-chk-item input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .filter-sep { height: 1px; background: var(--border); margin: 4px 0; }
   .filter-count { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
-  .btn-clear-filters { height: 34px; font-size: 12px; padding: 0 10px; color: var(--text-muted); border-color: var(--border); }
+  .btn-clear-filters { height: 34px; font-size: 12px; padding: 0 10px; color: var(--text-muted); border-color: var(--border); flex-shrink: 0; }
   .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 14px; }
   /* Modal lista UPs */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; }
@@ -302,31 +315,63 @@ function renderModoAdmin(){
             <button class="btn-bulk-del" onclick="eliminarSeleccionados()">🗑 Eliminar seleccionados</button>
             <button class="btn-bulk-cancel" onclick="cancelarSeleccion()">✕ Cancelar</button>
           </div>
-          <!-- Filtros -->
+          <!-- Filtros tipo Excel -->
           <div class="filter-bar">
             <div class="filter-row">
-              <div class="filter-group">
+              <!-- Reportante -->
+              <div class="filter-group" id="fg-nombre">
                 <label>Reportante</label>
-                <select id="f-nombre" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+                <button class="filter-dropdown-btn" onclick="toggleDropdown('dd-nombre',event)" id="btn-dd-nombre">
+                  <span id="lbl-nombre">Todos</span> <span>▾</span>
+                </button>
+                <div class="filter-dropdown-panel" id="dd-nombre">
+                  <div class="filter-chk-item"><input type="checkbox" id="chk-all-nombre" checked onchange="toggleAllFilter('nombre',this.checked)" /><label for="chk-all-nombre" style="cursor:pointer;margin:0;font-weight:400;">(Seleccionar todo)</label></div>
+                  <div class="filter-sep"></div>
+                  <div id="dd-nombre-items"></div>
+                </div>
               </div>
-              <div class="filter-group">
+              <!-- Tipo -->
+              <div class="filter-group" id="fg-tipo">
                 <label>Tipo</label>
-                <select id="f-tipo" onchange="aplicarFiltros()">
-                  <option value="">Todos</option>
-                  <option value="V1 y V2">V1 + V2</option>
-                  <option value="Transferencias">Transferencias</option>
-                  <option value="Todo">Todo</option>
-                </select>
+                <button class="filter-dropdown-btn" onclick="toggleDropdown('dd-tipo',event)" id="btn-dd-tipo">
+                  <span id="lbl-tipo">Todos</span> <span>▾</span>
+                </button>
+                <div class="filter-dropdown-panel" id="dd-tipo">
+                  <div class="filter-chk-item"><input type="checkbox" id="chk-all-tipo" checked onchange="toggleAllFilter('tipo',this.checked)" /><label for="chk-all-tipo" style="cursor:pointer;margin:0;font-weight:400;">(Seleccionar todo)</label></div>
+                  <div class="filter-sep"></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-tipo" value="V1 y V2" checked onchange="onFilterChange('tipo')" /><label style="cursor:pointer;margin:0;font-weight:400;">V1 + V2</label></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-tipo" value="Transferencias" checked onchange="onFilterChange('tipo')" /><label style="cursor:pointer;margin:0;font-weight:400;">Transferencias</label></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-tipo" value="Todo" checked onchange="onFilterChange('tipo')" /><label style="cursor:pointer;margin:0;font-weight:400;">Todo</label></div>
+                </div>
               </div>
-              <div class="filter-group">
+              <!-- Estado -->
+              <div class="filter-group" id="fg-estado">
                 <label>Estado</label>
-                <select id="f-estado" onchange="aplicarFiltros()">
-                  <option value="">Todos</option>
-                  <option value="pendiente">Pendiente</option>
-                  <option value="espera">En espera</option>
-                  <option value="done">Verificado</option>
-                </select>
+                <button class="filter-dropdown-btn" onclick="toggleDropdown('dd-estado',event)" id="btn-dd-estado">
+                  <span id="lbl-estado">Todos</span> <span>▾</span>
+                </button>
+                <div class="filter-dropdown-panel" id="dd-estado">
+                  <div class="filter-chk-item"><input type="checkbox" id="chk-all-estado" checked onchange="toggleAllFilter('estado',this.checked)" /><label for="chk-all-estado" style="cursor:pointer;margin:0;font-weight:400;">(Seleccionar todo)</label></div>
+                  <div class="filter-sep"></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-estado" value="pendiente" checked onchange="onFilterChange('estado')" /><label style="cursor:pointer;margin:0;font-weight:400;">Pendiente</label></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-estado" value="espera" checked onchange="onFilterChange('estado')" /><label style="cursor:pointer;margin:0;font-weight:400;">En espera</label></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-estado" value="done" checked onchange="onFilterChange('estado')" /><label style="cursor:pointer;margin:0;font-weight:400;">Verificado</label></div>
+                </div>
               </div>
+              <!-- Descargada -->
+              <div class="filter-group" id="fg-desc">
+                <label>Descarga</label>
+                <button class="filter-dropdown-btn" onclick="toggleDropdown('dd-desc',event)" id="btn-dd-desc">
+                  <span id="lbl-desc">Todas</span> <span>▾</span>
+                </button>
+                <div class="filter-dropdown-panel" id="dd-desc">
+                  <div class="filter-chk-item"><input type="checkbox" id="chk-all-desc" checked onchange="toggleAllFilter('desc',this.checked)" /><label for="chk-all-desc" style="cursor:pointer;margin:0;font-weight:400;">(Seleccionar todo)</label></div>
+                  <div class="filter-sep"></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-desc" value="si" checked onchange="onFilterChange('desc')" /><label style="cursor:pointer;margin:0;font-weight:400;">🚩 Descargada</label></div>
+                  <div class="filter-chk-item"><input type="checkbox" class="fchk-desc" value="no" checked onchange="onFilterChange('desc')" /><label style="cursor:pointer;margin:0;font-weight:400;">Sin descargar</label></div>
+                </div>
+              </div>
+              <!-- Fechas -->
               <div class="filter-group">
                 <label>Desde</label>
                 <input type="date" id="f-desde" onchange="aplicarFiltros()" />
@@ -581,45 +626,132 @@ async function cargarAdmin(){
   try{
     const data=await sbGet('reportes','order=done.asc,estado.asc,created_at.asc');
     todosLosReportes=data;
-    // Poblar filtro de nombres
-    const fNombre=document.getElementById('f-nombre');
-    if(fNombre){
-      const cur=fNombre.value;
-      const nombres=[...new Set(data.map(r=>r.nombre))].sort();
-      fNombre.innerHTML='<option value="">Todos</option>'+nombres.map(n=>`<option value="${n}" ${n===cur?'selected':''}>${n}</option>`).join('');
-    }
+    poblarFiltroNombres(data);
     renderQueue(data);
   }catch(e){document.getElementById('queue-list').innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
 }
 
+// ── Filtros tipo Excel ───────────────────────────────────────────────────────
+function toggleDropdown(id, e){
+  e.stopPropagation();
+  document.querySelectorAll('.filter-dropdown-panel').forEach(p=>{
+    if(p.id!==id) p.classList.remove('open');
+  });
+  document.getElementById(id)?.classList.toggle('open');
+}
+document.addEventListener('click',()=>{
+  document.querySelectorAll('.filter-dropdown-panel').forEach(p=>p.classList.remove('open'));
+});
+
+function toggleAllFilter(grupo, checked){
+  document.querySelectorAll(`.fchk-${grupo}`).forEach(c=>c.checked=checked);
+  aplicarFiltros();
+}
+
+function onFilterChange(grupo){
+  const all=[...document.querySelectorAll(`.fchk-${grupo}`)];
+  const allChecked=all.every(c=>c.checked);
+  const el=document.getElementById(`chk-all-${grupo}`);
+  if(el) el.checked=allChecked;
+  aplicarFiltros();
+}
+
+function getCheckedValues(grupo){
+  return [...document.querySelectorAll(`.fchk-${grupo}:checked`)].map(c=>c.value);
+}
+
+function updateDropdownLabel(grupo, total){
+  const checked=getCheckedValues(grupo);
+  const btn=document.getElementById(`btn-dd-${grupo}`);
+  const lbl=document.getElementById(`lbl-${grupo}`);
+  if(!btn||!lbl) return;
+  if(checked.length===0){ lbl.textContent='(Ninguno)'; btn.classList.add('active'); }
+  else if(checked.length===total){ lbl.textContent='Todos'; btn.classList.remove('active'); }
+  else{ lbl.textContent=`${checked.length} sel.`; btn.classList.add('active'); }
+}
+
+function poblarFiltroNombres(data){
+  const nombres=[...new Set(data.map(r=>r.nombre))].sort();
+  const container=document.getElementById('dd-nombre-items');
+  const allEl=document.getElementById('chk-all-nombre');
+  if(!container) return;
+  const prevSel=getCheckedValues('nombre');
+  container.innerHTML=nombres.map(n=>`
+    <div class="filter-chk-item">
+      <input type="checkbox" class="fchk-nombre" value="${n}" ${prevSel.length===0||prevSel.includes(n)?'checked':''} onchange="onFilterChange('nombre')" />
+      <label style="cursor:pointer;margin:0;font-weight:400;">${n}</label>
+    </div>`).join('');
+  if(allEl) allEl.checked=[...document.querySelectorAll('.fchk-nombre')].every(c=>c.checked);
+}
+
 function aplicarFiltros(){
-  const fNombre=document.getElementById('f-nombre')?.value||'';
-  const fTipo=document.getElementById('f-tipo')?.value||'';
-  const fEstado=document.getElementById('f-estado')?.value||'';
+  const selNombre=getCheckedValues('nombre');
+  const selTipo=getCheckedValues('tipo');
+  const selEstado=getCheckedValues('estado');
+  const selDesc=getCheckedValues('desc');
   const fDesde=document.getElementById('f-desde')?.value||'';
   const fHasta=document.getElementById('f-hasta')?.value||'';
+
   let datos=todosLosReportes;
-  if(fNombre) datos=datos.filter(r=>r.nombre===fNombre);
-  if(fTipo) datos=datos.filter(r=>r.tipo&&r.tipo.includes(fTipo));
-  if(fEstado==='done') datos=datos.filter(r=>r.done);
-  else if(fEstado==='espera') datos=datos.filter(r=>!r.done&&r.estado==='espera');
-  else if(fEstado==='pendiente') datos=datos.filter(r=>!r.done&&r.estado!=='espera');
+  if(selNombre.length) datos=datos.filter(r=>selNombre.includes(r.nombre));
+  if(selTipo.length) datos=datos.filter(r=>r.tipo&&selTipo.some(t=>r.tipo.includes(t)));
+  if(selEstado.length){
+    datos=datos.filter(r=>{
+      if(r.done) return selEstado.includes('done');
+      if(r.estado==='espera') return selEstado.includes('espera');
+      return selEstado.includes('pendiente');
+    });
+  }
+  if(selDesc.length && selDesc.length<2){
+    if(selDesc.includes('si')) datos=datos.filter(r=>r.descargada);
+    if(selDesc.includes('no')) datos=datos.filter(r=>!r.descargada);
+  }
   if(fDesde) datos=datos.filter(r=>new Date(r.created_at)>=new Date(fDesde));
   if(fHasta) datos=datos.filter(r=>new Date(r.created_at)<=new Date(fHasta+'T23:59:59'));
+
+  // Actualizar labels
+  const totalNombres=[...new Set(todosLosReportes.map(r=>r.nombre))].length;
+  updateDropdownLabel('nombre', totalNombres);
+  updateDropdownLabel('tipo', 3);
+  updateDropdownLabel('estado', 3);
+  updateDropdownLabel('desc', 2);
+
   renderQueue(datos);
-  const hayFiltros=fNombre||fTipo||fEstado||fDesde||fHasta;
+  const hayFiltros=selNombre.length<totalNombres||selTipo.length<3||selEstado.length<3||selDesc.length<2||fDesde||fHasta;
   const fc=document.getElementById('filter-count');
   if(fc) fc.textContent=hayFiltros?`Mostrando ${datos.length} de ${todosLosReportes.length} reportes`:'';
 }
 
 function limpiarFiltros(){
-  ['f-nombre','f-tipo','f-estado','f-desde','f-hasta'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.value='';
+  document.querySelectorAll('.fchk-nombre,.fchk-tipo,.fchk-estado,.fchk-desc').forEach(c=>c.checked=true);
+  ['chk-all-nombre','chk-all-tipo','chk-all-estado','chk-all-desc'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.checked=true;
   });
-  const fc=document.getElementById('filter-count');
-  if(fc)fc.textContent='';
+  ['btn-dd-nombre','btn-dd-tipo','btn-dd-estado','btn-dd-desc'].forEach(id=>{
+    document.getElementById(id)?.classList.remove('active');
+  });
+  ['lbl-nombre','lbl-tipo','lbl-estado'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent='Todos';
+  });
+  const lblDesc=document.getElementById('lbl-desc'); if(lblDesc) lblDesc.textContent='Todas';
+  const fd=document.getElementById('f-desde'); if(fd) fd.value='';
+  const fh=document.getElementById('f-hasta'); if(fh) fh.value='';
+  const fc=document.getElementById('filter-count'); if(fc) fc.textContent='';
   renderQueue(todosLosReportes);
+}
+
+// ── Bandera descargada ───────────────────────────────────────────────────────
+async function toggleBandera(id, valor){
+  try{
+    await sbPatch('reportes',id,{descargada:valor});
+    // Actualizar en cache sin recargar todo
+    const idx=todosLosReportes.findIndex(r=>r.id===id);
+    if(idx>=0) todosLosReportes[idx].descargada=valor;
+    const item=document.getElementById('qi-'+id);
+    const btn=item?.querySelector('.flag-btn');
+    if(item){ item.classList.toggle('is-flagged',valor); }
+    if(btn){ btn.classList.toggle('flagged',valor); btn.title=valor?'Quitar marca de descargada':'Marcar como descargada'; }
+  }catch(e){alert('Error: '+e.message);}
 }
 
 function renderQueue(data){
@@ -631,7 +763,8 @@ function renderQueue(data){
   actualizarBadge(total-done);
     if(!data.length){list.innerHTML='<div class="empty">📥<br>Sin reportes para los filtros aplicados.</div>';return;}
     list.innerHTML=data.map((r,i)=>`
-      <div class="queue-item ${r.done?'is-done':r.estado==='espera'?'is-espera':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}">
+      <div class="queue-item ${r.done?'is-done':r.estado==='espera'?'is-espera':''} ${r.descargada?'is-flagged':''} ${seleccionados.has(r.id)?'selected':''}" id="qi-${r.id}" style="position:relative;">
+        <button class="flag-btn ${r.descargada?'flagged':''}" onclick="toggleBandera(${r.id},${!r.descargada})" title="${r.descargada?'Quitar marca de descargada':'Marcar como descargada'}">🚩</button>
         <div class="queue-main">
           ${modoSeleccion?`<div class="queue-check"><input type="checkbox" ${seleccionados.has(r.id)?'checked':''} onchange="toggleCheck(${r.id})" /></div>`:''}
           <div class="queue-num">#${i+1}</div>
