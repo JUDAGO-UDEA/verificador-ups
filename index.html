@@ -312,7 +312,8 @@ function renderModoAdmin(){
           <!-- Barra selección múltiple -->
           <div class="bulk-bar" id="bulk-bar">
             <span id="bulk-count">0 seleccionados</span>
-            <button class="btn-bulk-del" onclick="eliminarSeleccionados()">🗑 Eliminar seleccionados</button>
+            <button class="btn-bulk-del" onclick="marcarSeleccionadosListos()" style="background:var(--success);color:#fff;border:none;border-radius:var(--radius);padding:0 14px;height:32px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">✓ Marcar listos</button>
+            <button class="btn-bulk-del" onclick="eliminarSeleccionados()">🗑 Eliminar</button>
             <button class="btn-bulk-cancel" onclick="cancelarSeleccion()">✕ Cancelar</button>
           </div>
           <!-- Filtros tipo Excel -->
@@ -466,6 +467,25 @@ function toggleCheck(id){
     bar.classList.toggle('visible', seleccionados.size > 0);
     count.textContent = `${seleccionados.size} seleccionado${seleccionados.size!==1?'s':''}`;
   }
+}
+
+async function marcarSeleccionadosListos(){
+  if(!seleccionados.size) return;
+  const pendientes=[...seleccionados].filter(id=>{
+    const r=todosLosReportes.find(x=>x.id===id);
+    return r && !r.done;
+  });
+  if(!pendientes.length){ alert('Todos los seleccionados ya están verificados.'); return; }
+  if(!confirm(`¿Marcar ${pendientes.length} reporte(s) como verificados?`)) return;
+  try{
+    await Promise.all(pendientes.map(id=>sbPatch('reportes',id,{done:true,done_ts:new Date().toISOString()})));
+    seleccionados.clear();
+    modoSeleccion=false;
+    const btn=document.getElementById('btn-sel-mode');
+    if(btn) btn.textContent='☑ Seleccionar';
+    document.getElementById('bulk-bar')?.classList.remove('visible');
+    cargarAdmin();
+  }catch(e){ alert('Error: '+e.message); }
 }
 
 async function eliminarSeleccionados(){
