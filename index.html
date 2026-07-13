@@ -583,6 +583,7 @@ async function enviarReporte(){
     chkV12().checked=false; chkTf().checked=false; chkTodo().checked=false;
     showAlert('alert-ok',true);
     setTimeout(()=>showAlert('alert-ok',false),4500);
+    reproducirSonido();
     cargarMisReportes();
     if(!MODO_REPORTE) actualizarBadge();
   }catch(e){
@@ -985,6 +986,27 @@ function descargarExcelUPs(){
   a.href=URL.createObjectURL(blob);
   a.download=`ups-pendientes-${fechaArchivo}.csv`;
   a.click();
+}
+
+// ── Sonido de notificación ───────────────────────────────────────────────────
+function reproducirSonido(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const tiempos=[0, 0.15, 0.3];
+    const notas=[523.25, 659.25, 783.99]; // Do - Mi - Sol (acorde mayor)
+    tiempos.forEach((t,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(notas[i], ctx.currentTime+t);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.35);
+      osc.start(ctx.currentTime+t);
+      osc.stop(ctx.currentTime+t+0.35);
+    });
+  }catch(e){ /* silencioso si el navegador bloquea */ }
 }
 
 // ── Configuración ────────────────────────────────────────────────────────────
