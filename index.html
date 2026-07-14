@@ -133,6 +133,13 @@
   .filter-sep { height: 1px; background: var(--border); margin: 4px 0; }
   .filter-count { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
   .btn-clear-filters { height: 34px; font-size: 12px; padding: 0 10px; color: var(--text-muted); border-color: var(--border); flex-shrink: 0; }
+  /* Pestañas de cola */
+  .queue-tabs { display: flex; gap: 0; margin-bottom: 1rem; border-bottom: 2px solid var(--border); }
+  .queue-tab { padding: 8px 18px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
+  .queue-tab:hover { color: var(--text-primary); }
+  .queue-tab.active { color: var(--accent-text); border-bottom-color: var(--accent); }
+  .queue-tab .tab-badge { background: var(--warning); color: #fff; border-radius: 20px; font-size: 11px; font-weight: 600; min-width: 18px; height: 18px; padding: 0 5px; display: inline-flex; align-items: center; justify-content: center; }
+  .queue-tab.active .tab-badge { background: var(--accent); }
   .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 14px; }
   /* Modal lista UPs */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; }
